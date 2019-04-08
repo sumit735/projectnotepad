@@ -37,6 +37,7 @@
                     $error .= "couldn't sign you up.please try again later".mysqli_error($connection);
                 } else {
                     echo "signup successful";
+                    echo "hello world";
                 }
             }
         }
