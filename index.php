@@ -1,6 +1,14 @@
 <?php 
     session_start();
     $error = "";
+    if(array_key_exists("logout", $_GET)) {
+        unset($_SESSION);
+        session_destroy();
+        setcookie("id", "", time() - 60*60*24*365);
+        $_COOKIE['id'] = "";
+    } else if (array_key_exists("id", $_SESSION) OR array_key_exists("id", $_COOKIE)) {
+        header("location: loggedIn.php");
+    }
     if(isset($_POST['signup'])) {
         $connection = mysqli_connect("localhost","root","","notepad");
         // $error = "";
@@ -19,30 +27,42 @@
         }
 
         if($error != "") {
+
             $error = "There were error(s) in your form.<br> ".$error;
+
         } else {
-            $query = "SELECT id FROM `users` WHERE email = '".mysqli_real_escape_string($connection, $_POST['email'])."' LIMIT 1";
 
-            $result = mysqli_query($connection, $query);
+            if($_POST["register"] == "1"){
 
-            if(mysqli_num_rows($result) > 0) {
-                $error .= "This email address is taken";
-            } else {
-                $name = mysqli_real_escape_string($connection, $_POST['names']);
-                $email = mysqli_real_escape_string($connection, $_POST['email']);
-                $pass =  mysqli_real_escape_string($connection, $_POST['pass']);
+                $query = "SELECT id FROM `users` WHERE email = '".mysqli_real_escape_string($connection, $_POST['email'])."' LIMIT 1";
 
-                $query =  "INSERT INTO `users` (`name`,`email`,`password`) VALUES('$name', '$email', '$pass')";
-                
-                if(!mysqli_query($connection, $query)) {
-                    $error .= "couldn't sign you up.please try again later".mysqli_error($connection);
+                $result = mysqli_query($connection, $query);
+
+                if(mysqli_num_rows($result) > 0) {
+                    $error .= "This email address is taken";
                 } else {
-                    $query = "UPDATE `users` SET password = '".md5(md5(mysqli_insert_id($connection)).$pass)."' WHERE id = ".mysqli_insert_id($connection)." LIMIT 1";
-                    mysqli_query($connection, $query);
+                    $name = mysqli_real_escape_string($connection, $_POST['names']);
+                    $email = mysqli_real_escape_string($connection, $_POST['email']);
+                    $pass =  mysqli_real_escape_string($connection, $_POST['pass']);
+
+                    $query =  "INSERT INTO `users` (`name`,`email`,`password`) VALUES('$name', '$email', '$pass')";
                     
-                    $_SESSION['name'] = $name;
-                    header("location: loggedIn.php");
+                    if(!mysqli_query($connection, $query)) {
+                        $error .= "couldn't sign you up.please try again later".mysqli_error($connection);
+                    } else {
+                        $query = "UPDATE `users` SET password = '".md5(md5(mysqli_insert_id($connection)).$pass)."' WHERE id = ".mysqli_insert_id($connection)." LIMIT 1";
+                        mysqli_query($connection, $query);
+                        
+                        $_SESSION['id'] = mysqli_insert_id($connection);
+                        if($_POST['remember-me'] == '1') {
+                            setcookie("id", mysqli_insert_id($connection), time() + 60*60*24*365);
+                        }
+                        header("location: loggedIn.php");
+                    }
                 }
+
+            } else {
+                echo "logging in";
             }
         }
     }
@@ -92,8 +112,12 @@
                                 <input type="password" name="re_pass" id="re_pass" placeholder="Repeat your password"/>
                             </div>
                             <div class="form-group">
-                                <input type="checkbox" name="agree-term" id="agree-term" class="agree-term" />
-                                <label for="agree-term" class="label-agree-term"><span><span></span></span>I agree all statements in  <a href="#" class="term-service">Terms of service</a></label>
+                                
+                                <input type="hidden" name="register" value="1"/>
+                            </div>
+                            <div class="form-group">
+                                <input type="checkbox" name="remember-me" id="remember-me" class="agree-term" />
+                                <label for="remember-me" class="label-agree-term"><span><span></span></span>Remember me</label>
                             </div>
                             <div class="form-group form-button">
                                 <input type="submit" name="signup" id="signup" class="form-submit" value="Register"/>
@@ -122,16 +146,20 @@
                         <form method="POST" class="register-form" id="login-form">
                             <div class="form-group">
                                 <label for="your_name"><i class="zmdi zmdi-account material-icons-name"></i></label>
-                                <input type="text" name="your_name" id="your_name" placeholder="Your Name"/>
+                                <input type="email" name="email" id="email" placeholder="Your Email"/>
                             </div>
                             <div class="form-group">
                                 <label for="your_pass"><i class="zmdi zmdi-lock"></i></label>
-                                <input type="password" name="your_pass" id="your_pass" placeholder="Password"/>
+                                <input type="password" name="pass" id="your_pass" placeholder="Password"/>
                             </div>
                             <div class="form-group">
-                                <input type="checkbox" name="remember-me" id="remember-me" class="agree-term" />
-                                <label for="remember-me" class="label-agree-term"><span><span></span></span>Remember me</label>
+                                
+                                <input type="hidden" name="register" value="0"/>
                             </div>
+                            <!-- <div class="form-group">
+                                <input type="checkbox" name="remember-me" id="remember-me" value="1" />
+                                <label for="remember-me" class="label-agree-term"><span><span></span></span>Remember me</label>
+                            </div> -->
                             <div class="form-group form-button">
                                 <input type="submit" name="signin" id="signin" class="form-submit" value="Log in"/>
                             </div>
