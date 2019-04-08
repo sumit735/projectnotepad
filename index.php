@@ -1,4 +1,5 @@
 <?php 
+    session_start();
     $error = "";
     if(isset($_POST['signup'])) {
         $connection = mysqli_connect("localhost","root","","notepad");
@@ -38,7 +39,9 @@
                 } else {
                     $query = "UPDATE `users` SET password = '".md5(md5(mysqli_insert_id($connection)).$pass)."' WHERE id = ".mysqli_insert_id($connection)." LIMIT 1";
                     mysqli_query($connection, $query);
-                    echo "signup successful";
+                    
+                    $_SESSION['name'] = $name;
+                    header("location: loggedIn.php");
                 }
             }
         }
