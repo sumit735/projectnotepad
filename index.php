@@ -1,10 +1,57 @@
+<?php 
+    $error = "";
+    if(isset($_POST['signup'])) {
+        $connection = mysqli_connect("localhost","root","","notepad");
+        // $error = "";
+        if(!$_POST['names']) {
+            $error .= "a name is required.<br>";
+        }
+        if(!$_POST['email']) {
+            $error .= "an email address is required.<br>";
+        }
+        if(!$_POST['pass']) {
+            $error .= "a password is required.<br>";
+        }
+
+        if($_POST['pass'] != $_POST['re_pass']) {
+            $error .= "please use the same password.<br>";
+        }
+
+        if($error != "") {
+            $error = "There were error(s) in your form.<br> ".$error;
+        } else {
+            $query = "SELECT id FROM `users` WHERE email = '".mysqli_real_escape_string($connection, $_POST['email'])."' LIMIT 1";
+
+            $result = mysqli_query($connection, $query);
+
+            if(mysqli_num_rows($result) > 0) {
+                $error .= "This email address is taken";
+            } else {
+                $name = mysqli_real_escape_string($connection, $_POST['names']);
+                $email = mysqli_real_escape_string($connection, $_POST['email']);
+                $pass =  mysqli_real_escape_string($connection, $_POST['pass']);
+
+                $query =  "INSERT INTO `users` (`name`,`email`,`password`) VALUES('$name', '$email', '$pass')";
+                
+                if(!mysqli_query($connection, $query)) {
+                    $error .= "couldn't sign you up.please try again later".mysqli_error($connection);
+                } else {
+                    echo "signup successful";
+                }
+            }
+        }
+    }
+   
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Sign Up Form by Colorlib</title>
+    <title>Log In</title>
 
     <!-- Font Icon -->
     <link rel="stylesheet" href="fonts/material-icon/css/material-design-iconic-font.min.css">
@@ -13,7 +60,7 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
+    <div id="error" style="background-color: rgb(206, 51, 51)"> <?php echo $error; ?></div>
     <div class="main">
 
         <!-- Sign up form -->
@@ -25,7 +72,7 @@
                         <form method="POST" class="register-form" id="register-form">
                             <div class="form-group">
                                 <label for="name"><i class="zmdi zmdi-account material-icons-name"></i></label>
-                                <input type="text" name="name" id="name" placeholder="Your Name"/>
+                                <input type="text" name="names" id="name" placeholder="Your Name"/>
                             </div>
                             <div class="form-group">
                                 <label for="email"><i class="zmdi zmdi-email"></i></label>
