@@ -1,0 +1,27 @@
+html { overflow-y: hidden; }
+
+body {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(images/bg.jpg);
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    background-attachment: fixed;
+}
+
+.main {
+    margin-top: 20px;
+}
+#nav li ul {
+    position: absolute;
+    z-index: 100;
+}
+.navbar .btn {
+    float: right;
+}
+
+.dropdown button {
+    margin-right: 90px;
+    /* position: absolute; */
+z-index: 100;
+}
+
