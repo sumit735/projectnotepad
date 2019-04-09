@@ -1,4 +1,5 @@
-<?php 
+<?php
+    include "functions.php";
     session_start();
     $error = "";
     if(array_key_exists("logout", $_GET)) {
@@ -10,7 +11,7 @@
         header("location: loggedIn.php");
     }
     if(isset($_POST['signup'])) {
-        $connection = mysqli_connect("localhost","root","","notepad");
+        
         // $error = "";
         if(!$_POST['names']) {
             $error .= "a name is required.<br>";
@@ -65,6 +66,9 @@
         }
     } else if(isset($_POST['signin'])) {
 
+        // $connection = mysqli_connect("localhost","root","","notepad");
+        
+
         if(!$_POST['email']) {
             $error .= "an email address is required.<br>";
         }
@@ -76,7 +80,29 @@
             $error = "there were error(s) in your form<br> ".$error;
         } else {
             if($_POST["register"] == "0") {
-                echo "signing you in";
+                $email = mysqli_real_escape_string($connection, $_POST['email']);
+                $pass = mysqli_real_escape_string($connection, $_POST['pass']);
+                $query = "SELECT * FROM `users` WHERE email = '".$email."'";
+
+                $result = mysqli_query($connection, $query);
+                
+                $row = mysqli_fetch_array($result);
+                if(isset($row)) {
+
+                    $hashedPass = md5(md5($row['ID']).$pass);
+
+                    if($hashedPass == $row['password']) {
+                        
+                        $_SESSION['id'] = $row['ID'];
+                        setcookie("id", $row['ID'], time() + 60*60*24*365);
+                        header("location: loggedIn.php");
+                    } else {
+                        $error = "You are not authorized to log in.please check your email and password again.";
+                    }
+                }else {
+                    $error = "You are not authorized to log in.please check your email and password again.";
+                }
+
             }
         }
 
@@ -169,10 +195,10 @@
                             <div class="form-group">
                                 <input type="hidden" name="register" value="0"/>
                             </div>
-                            <div class="form-group">
-                                <input type="checkbox" name="remember-me" id="remember-me" value="1" />
+                            <!-- <div class="form-group">
+                                <input type="checkbox" name="remember-me" id="remember-me" class="agree-term" />
                                 <label for="remember-me" class="label-agree-term"><span><span></span></span>Remember me</label>
-                            </div>
+                            </div> -->
                             <div class="form-group form-button">
                                 <input type="submit" name="signin" id="signup" class="form-submit" value="Log In"/>
                             </div>
