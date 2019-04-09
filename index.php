@@ -30,7 +30,7 @@
 
             $error = "There were error(s) in your form.<br> ".$error;
 
-        } else {
+        }else {
 
             if($_POST["register"] == "1"){
 
@@ -61,10 +61,25 @@
                     }
                 }
 
-            } else {
-                echo "logging in";
             }
         }
+    } else if(isset($_POST['signin'])) {
+
+        if(!$_POST['email']) {
+            $error .= "an email address is required.<br>";
+        }
+        if(!$_POST['pass']) {
+            $error .= "a password is required.<br>";
+        }
+
+        if($error != "") {
+            $error = "there were error(s) in your form<br> ".$error;
+        } else {
+            if($_POST["register"] == "0") {
+                echo "signing you in";
+            }
+        }
+
     }
    
 ?>
@@ -112,7 +127,6 @@
                                 <input type="password" name="re_pass" id="re_pass" placeholder="Repeat your password"/>
                             </div>
                             <div class="form-group">
-                                
                                 <input type="hidden" name="register" value="1"/>
                             </div>
                             <div class="form-group">
@@ -144,24 +158,23 @@
                     <div class="signin-form">
                         <h2 class="form-title">Log in</h2>
                         <form method="POST" class="register-form" id="login-form">
-                            <div class="form-group">
-                                <label for="your_name"><i class="zmdi zmdi-account material-icons-name"></i></label>
+                        <div class="form-group">
+                                <label for="email"><i class="zmdi zmdi-email"></i></label>
                                 <input type="email" name="email" id="email" placeholder="Your Email"/>
                             </div>
                             <div class="form-group">
-                                <label for="your_pass"><i class="zmdi zmdi-lock"></i></label>
-                                <input type="password" name="pass" id="your_pass" placeholder="Password"/>
+                                <label for="pass"><i class="zmdi zmdi-lock"></i></label>
+                                <input type="password" name="pass" id="pass" placeholder="Password"/>
                             </div>
                             <div class="form-group">
-                                
                                 <input type="hidden" name="register" value="0"/>
                             </div>
-                            <!-- <div class="form-group">
+                            <div class="form-group">
                                 <input type="checkbox" name="remember-me" id="remember-me" value="1" />
                                 <label for="remember-me" class="label-agree-term"><span><span></span></span>Remember me</label>
-                            </div> -->
+                            </div>
                             <div class="form-group form-button">
-                                <input type="submit" name="signin" id="signin" class="form-submit" value="Log in"/>
+                                <input type="submit" name="signin" id="signup" class="form-submit" value="Log In"/>
                             </div>
                         </form>
                         <div class="social-login">
