@@ -25,3 +25,8 @@ body {
 z-index: 100;
 }
 
+.container {
+    background-color: white;
+    width: 60%;
+    height: auto;
+}
